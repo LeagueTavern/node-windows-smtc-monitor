@@ -1,0 +1,77 @@
+{
+  "name": "@coooookies/windows-smtc-monitor",
+  "description": "Fetch Windows SMTC media player information and listen for media control events (e.g., play, pause, skip). Suitable for Windows 1809 and later.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "author": {
+    "name": "Coooookies",
+    "email": "admin@mitay.net",
+    "url": "https://mitay.net"
+  },
+  "napi": {
+    "name": "windows-smtc-monitor",
+    "triples": {
+      "defaults": false,
+      "additional": [
+        "x86_64-pc-windows-msvc"
+      ]
+    }
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.4",
+    "@types/node": "^22.13.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2",
+    "ava": "^5.3.1"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "keywords": [
+    "windows",
+    "media",
+    "smtc",
+    "monitor",
+    "napi",
+    "native",
+    "addon"
+  ],
+  "files": [
+    "index.d.ts",
+    "index.js",
+    "binding.js",
+    "binding.d.ts"
+  ],
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release --js binding.js --dts binding.d.ts",
+    "build:debug": "napi build --platform --js binding.js --dts binding.d.ts",
+    "example": "npm run build && node -r @swc-node/register example/index.ts",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "ava __test__/**/index*.*",
+    "universal": "napi universal",
+    "version": "napi version"
+  },
+  "ava": {
+    "require": [
+      "@swc-node/register"
+    ],
+    "extensions": [
+      "ts"
+    ],
+    "timeout": "3m",
+    "environmentVariables": {
+      "TS_NODE_PROJECT": "./tsconfig.json"
+    }
+  },
+  "dependencies": {
+    "@swc-node/register": "^1.10.9",
+    "@swc/core": "^1.11.8"
+  }
+}

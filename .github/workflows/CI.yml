@@ -1,0 +1,128 @@
+name: CI
+env:
+  DEBUG: napi:*
+  APP_NAME: windows-smtc-monitor
+permissions:
+  contents: write
+  id-token: write
+'on':
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - '**'
+    paths-ignore:
+      - '**/*.md'
+      - LICENSE
+      - '**/*.gitignore'
+      - .editorconfig
+      - docs/**
+  pull_request: null
+jobs:
+  build:
+    name: stable - x86_64-pc-windows-msvc - node@20
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+      - name: Install
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: x86_64-pc-windows-msvc
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            .cargo-cache
+            target/
+          key: x86_64-pc-windows-msvc-cargo-windows-latest
+      - name: Install dependencies
+        run: yarn install
+      - name: Build
+        run: yarn build --target x86_64-pc-windows-msvc
+        shell: bash
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bindings-x86_64-pc-windows-msvc
+          path: ${{ env.APP_NAME }}.*.node
+          if-no-files-found: error
+  test-windows-binding:
+    name: Test bindings on x86_64-pc-windows-msvc - node@${{ matrix.node }}
+    needs:
+      - build
+    strategy:
+      fail-fast: false
+      matrix:
+        node:
+          - '18'
+          - '20'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: yarn
+          architecture: x64
+      - name: Install dependencies
+        run: yarn install
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: bindings-x86_64-pc-windows-msvc
+          path: .
+      - name: List packages
+        run: ls -R .
+        shell: bash
+      - name: Test bindings
+        run: yarn test
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs:
+      - test-windows-binding
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+      - name: Install dependencies
+        run: yarn install
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Move artifacts
+        run: yarn artifacts
+      - name: List packages
+        run: ls -R ./npm
+        shell: bash
+      - name: Publish
+        run: |
+          npm config set provenance true
+          if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$";
+          then
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            npm publish --access public
+          elif git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+";
+          then
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            npm publish --tag next --access public
+          else
+            echo "Not a release, skipping publish"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
