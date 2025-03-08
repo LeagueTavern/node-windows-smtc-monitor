@@ -99,6 +99,11 @@ class SMTCMonitor extends EventEmitter {
   getMediaSessionByAppId(sourceAppId) {
     return this.smtc.getSessionById(sourceAppId)
   }
+
+  destroy() {
+    this.smtc.destroy()
+    this.removeAllListeners()
+  }
 }
 
 function _checkCompatibility() {

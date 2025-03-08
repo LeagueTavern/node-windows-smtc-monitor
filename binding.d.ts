@@ -30,4 +30,5 @@ export declare class SMTCMonitor {
   getCurrentSession(): MediaInfo | null
   getAllSessions(): Array<MediaInfo>
   getSessionById(sourceAppId: string): MediaInfo | null
+  destroy(): void
 }

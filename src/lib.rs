@@ -17,7 +17,7 @@ use napi::{
 };
 use std::sync::{Arc, Mutex};
 use windows::{
-  Foundation::TypedEventHandler,
+  Foundation::{EventRegistrationToken, TypedEventHandler},
   Media::Control::{
     GlobalSystemMediaTransportControlsSession, GlobalSystemMediaTransportControlsSessionManager,
   },
@@ -31,15 +31,17 @@ use crate::utils::win_to_napi_err;
 pub struct SMTCMonitor {
   manager: Arc<Mutex<SessionManager>>,
   smtc_manager: Option<GlobalSystemMediaTransportControlsSessionManager>,
+  sessions_changed_token: Option<EventRegistrationToken>, // 添加此字段以存储会话变更事件的令牌
 }
 
 #[napi]
-impl SMTCMonitor  {
+impl SMTCMonitor {
   #[napi(constructor)]
   pub fn new() -> Self {
     Self {
       manager: Arc::new(Mutex::new(SessionManager::new())),
       smtc_manager: None,
+      sessions_changed_token: None,
     }
   }
 
@@ -53,7 +55,7 @@ impl SMTCMonitor  {
     self.scan_existing_sessions()?;
 
     // 监听会话变更事件，在回调内避免使用 NAPI 错误处理
-    let _token = win_to_napi_err(
+    let token = win_to_napi_err(
       manager.SessionsChanged(&TypedEventHandler::new(move |_, _| {
         let manager = manager_clone.clone();
         if let Ok(sessions) = manager.GetSessions() {
@@ -99,6 +101,9 @@ impl SMTCMonitor  {
         Ok(())
       })),
     )?;
+
+    // 存储令牌以便之后可以取消注册
+    self.sessions_changed_token = Some(token);
 
     Ok(())
   }
@@ -200,6 +205,42 @@ impl SMTCMonitor  {
     }
 
     Ok(None)
+  }
+
+  #[napi]
+  pub fn destroy(&mut self) -> Result<()> {
+    // 移除会话变更事件监听器
+    if let (Some(manager), Some(token)) = (&self.smtc_manager, self.sessions_changed_token.take()) {
+      if let Err(e) = manager.RemoveSessionsChanged(token) {
+        return Err(Error::new(
+          Status::GenericFailure,
+          format!("Failed to remove sessions changed event handler: {}", e),
+        ));
+      }
+    }
+
+    // 清理所有会话的事件监听器
+    if let Ok(mut inner) = self.manager.lock() {
+      // 清理所有会话的事件监听
+      inner.clear_all_sessions();
+
+      // 清理所有回调函数
+      inner.session_added_callbacks.clear();
+      inner.session_removed_callbacks.clear();
+      inner.media_props_callbacks.clear();
+      inner.playback_info_callbacks.clear();
+      inner.timeline_props_callbacks.clear();
+    } else {
+      return Err(Error::new(
+        Status::GenericFailure,
+        "Failed to acquire lock on session manager".to_string(),
+      ));
+    }
+
+    // 释放 SMTC 管理器
+    self.smtc_manager = None;
+
+    Ok(())
   }
 
   fn get_manager(&self) -> Result<GlobalSystemMediaTransportControlsSessionManager> {

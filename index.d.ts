@@ -30,6 +30,7 @@ declare class SMTCMonitor extends EventEmitter {
   getAllMediaSessions(): MediaInfo[]
   getCurrentMediaSession(): MediaInfo | null
   getMediaSessionByAppId(sourceAppId: string): MediaInfo | null
+  destroy(): void
 
   on(event: "session-media-changed", listener: (media: MediaInfo) => void): this
   on(

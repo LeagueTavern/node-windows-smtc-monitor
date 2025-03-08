@@ -20,3 +20,7 @@ test("getAllMediaSessions returns an empty array if no sessions are present", (t
 test("getMediaSessionByAppId returns null", (t) => {
   t.is(smtc.getMediaSessionByAppId("nonexistent"), null)
 })
+
+test.after.always("cleanup resources", () => {
+  smtc.destroy()
+})
