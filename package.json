@@ -1,5 +1,5 @@
 {
-  "name": "win-smtc-monitor",
+  "name": "@coooookies/win-smtc-monitor",
   "description": "Fetch Windows SMTC media player information and listen for media control events (e.g., play, pause, skip). Suitable for Windows 1809 and later.",
   "version": "1.0.0",
   "main": "index.js",
@@ -76,5 +76,6 @@
   "dependencies": {
     "@swc-node/register": "^1.10.9",
     "@swc/core": "^1.11.8"
-  }
+  },
+  "repository": "https://github.com/LeagueTavern/node-windows-smtc-monitor"
 }
