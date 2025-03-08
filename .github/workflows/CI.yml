@@ -1,7 +1,7 @@
 name: CI
 env:
   DEBUG: napi:*
-  APP_NAME: windows-smtc-monitor
+  APP_NAME: win-smtc-monitor
 permissions:
   contents: write
   id-token: write

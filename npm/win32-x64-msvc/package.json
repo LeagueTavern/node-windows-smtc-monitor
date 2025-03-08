@@ -1,5 +1,5 @@
 {
-  "name": "@coooookies/windows-smtc-monitor-win32-x64-msvc",
+  "name": "win-smtc-monitor-win32-x64-msvc",
   "version": "1.0.0",
   "os": [
     "win32"
@@ -7,9 +7,9 @@
   "cpu": [
     "x64"
   ],
-  "main": "windows-smtc-monitor.win32-x64-msvc.node",
+  "main": "win-smtc-monitor.win32-x64-msvc.node",
   "files": [
-    "windows-smtc-monitor.win32-x64-msvc.node"
+    "win-smtc-monitor.win32-x64-msvc.node"
   ],
   "license": "MIT",
   "engines": {
