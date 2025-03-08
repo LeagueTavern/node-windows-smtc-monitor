@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bindings-x86_64-pc-windows-msvc
-          path: ${{ env.APP_NAME }}.*.node
+          path: x86_64-pc-windows-msvc/${{ env.APP_NAME }}.*.node
           if-no-files-found: error
   test-windows-binding:
     name: Test bindings on x86_64-pc-windows-msvc - node@${{ matrix.node }}
