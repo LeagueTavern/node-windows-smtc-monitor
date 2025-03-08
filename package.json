@@ -46,7 +46,8 @@
     "index.d.ts",
     "index.js",
     "binding.js",
-    "binding.d.ts"
+    "binding.d.ts",
+    "constant.js"
   ],
   "scripts": {
     "artifacts": "napi artifacts",

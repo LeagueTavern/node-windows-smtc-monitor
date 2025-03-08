@@ -1,6 +1,18 @@
 import { EventEmitter } from "events"
 import { MediaInfo, SMTCMonitor as SMTC } from "./binding"
 
+/**
+ * Global System Media Transport Controls Session Playback Status
+ */
+export enum PlaybackStatus {
+  CLOSED = 0,
+  OPENED = 1,
+  CHANGING = 2,
+  STOPPED = 3,
+  PLAYING = 4,
+  PAUSED = 5,
+}
+
 declare class SMTCMonitor extends EventEmitter {
   constructor()
 

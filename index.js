@@ -1,5 +1,6 @@
 const os = require("os")
 const { EventEmitter } = require("events")
+const { PlaybackStatus } = require("./constant")
 const { SMTCMonitor: SMTC } = require("./binding")
 
 class SMTCMonitor extends EventEmitter {
@@ -143,4 +144,5 @@ _checkCompatibility()
 
 module.exports = {
   SMTCMonitor,
+  PlaybackStatus,
 }
