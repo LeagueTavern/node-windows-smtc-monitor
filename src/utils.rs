@@ -15,7 +15,6 @@ use windows::{
 
 use crate::types::MediaInfo;
 
-// 更简洁的错误处理函数
 pub fn win_to_napi_err<T>(result: core::Result<T>) -> Result<T> {
   result.map_err(|e| Error::new(Status::GenericFailure, e.to_string()))
 }
