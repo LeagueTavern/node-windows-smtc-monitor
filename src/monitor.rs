@@ -36,10 +36,8 @@ impl SMTCMonitor {
 
   #[napi]
   pub fn initialize(&mut self) -> Result<()> {
-    self.smtc_manager = match media_control::create_manager() {
-      Ok(manager) => Some(manager),
-      Err(e) => return Err(e),
-    };
+    // 使用 ? 运算符简化错误处理
+    self.smtc_manager = Some(media_control::create_manager()?);
 
     let manager = self.smtc_manager.as_ref().unwrap().clone();
     let manager_clone = manager.clone();
@@ -47,45 +45,10 @@ impl SMTCMonitor {
 
     self.scan_existing_sessions()?;
 
-    // 监听会话变更事件，在回调内避免使用 NAPI 错误处理
+    // 使用函数抽象简化事件处理逻辑
     let token = win_to_napi_err(
       manager.SessionsChanged(&TypedEventHandler::new(move |_, _| {
-        let manager = manager_clone.clone();
-        if let Ok(sessions) = manager.GetSessions() {
-          let mut inner = inner_manager.lock().unwrap();
-
-          let mut current_ids = Vec::new();
-
-          if let Ok(size) = sessions.Size() {
-            for i in 0..size {
-              if let Ok(session) = sessions.GetAt(i) {
-                if let Ok(id) = session.SourceAppUserModelId() {
-                  let id = id.to_string();
-                  current_ids.push(id.clone());
-
-                  if !inner.sessions.contains_key(&id) {
-                    Self::register_session(&mut inner, id.clone(), session);
-                  }
-                }
-              }
-            }
-
-            let mut removed_ids = Vec::new();
-            for id in inner.sessions.keys() {
-              if !current_ids.contains(id) {
-                removed_ids.push(id.clone());
-              }
-            }
-
-            for id in removed_ids {
-              inner.sessions.remove(&id);
-              // 通知会话已移除
-              for callback in &inner.session_removed_callbacks {
-                callback.call(Ok(id.clone()), ThreadsafeFunctionCallMode::Blocking);
-              }
-            }
-          }
-        }
+        Self::handle_sessions_changed(&manager_clone, &inner_manager);
         Ok(())
       })),
     )?;
@@ -96,6 +59,50 @@ impl SMTCMonitor {
     Ok(())
   }
 
+  // 将会话变更处理逻辑抽象为单独函数
+  fn handle_sessions_changed(
+    manager: &GlobalSystemMediaTransportControlsSessionManager,
+    inner_manager: &Arc<Mutex<SessionManager>>,
+  ) {
+    if let Ok(sessions) = manager.GetSessions() {
+      if let Ok(mut inner) = inner_manager.lock() {
+        let mut current_ids = Vec::new();
+
+        if let Ok(size) = sessions.Size() {
+          for i in 0..size {
+            if let Ok(session) = sessions.GetAt(i) {
+              if let Ok(id) = session.SourceAppUserModelId() {
+                let id = id.to_string();
+                current_ids.push(id.clone());
+
+                if !inner.sessions.contains_key(&id) {
+                  Self::register_session(&mut inner, id.clone(), session);
+                }
+              }
+            }
+          }
+
+          // 使用迭代器方法找出已删除的会话
+          let removed_ids: Vec<_> = inner
+            .sessions
+            .keys()
+            .filter(|id| !current_ids.contains(id))
+            .cloned()
+            .collect();
+
+          for id in removed_ids {
+            inner.sessions.remove(&id);
+            // 通知会话已移除
+            for callback in &inner.session_removed_callbacks {
+              callback.call(Ok(id.clone()), ThreadsafeFunctionCallMode::Blocking);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 以下是事件处理函数
   #[napi(ts_args_type = "callback: (error:unknown, media: MediaInfo) => void")]
   pub fn on_session_added(&mut self, callback: JsFunction) -> Result<()> {
     let tsfn: ThreadsafeFunction<MediaInfo> =
@@ -143,25 +150,20 @@ impl SMTCMonitor {
 
   #[napi]
   pub fn destroy(&mut self) -> Result<()> {
+    // 解绑事件监听器
     if let (Some(manager), Some(token)) = (&self.smtc_manager, self.sessions_changed_token.take()) {
-      if let Err(e) = manager.RemoveSessionsChanged(token) {
-        eprintln!("Failed to remove sessions changed event handler: {}", e);
-      }
+      let _ = manager.RemoveSessionsChanged(token);
     }
 
-    match self.manager.lock() {
-      Ok(mut inner) => {
-        inner.clear_all_sessions();
+    // 清理资源
+    if let Ok(mut inner) = self.manager.lock() {
+      inner.clear_all_sessions();
 
-        inner.session_added_callbacks.clear();
-        inner.session_removed_callbacks.clear();
-        inner.media_props_callbacks.clear();
-        inner.playback_info_callbacks.clear();
-        inner.timeline_props_callbacks.clear();
-      }
-      Err(e) => {
-        eprintln!("Failed to acquire lock on session manager: {}", e);
-      }
+      inner.session_added_callbacks.clear();
+      inner.session_removed_callbacks.clear();
+      inner.media_props_callbacks.clear();
+      inner.playback_info_callbacks.clear();
+      inner.timeline_props_callbacks.clear();
     }
 
     self.smtc_manager = None;
@@ -169,30 +171,29 @@ impl SMTCMonitor {
   }
 
   fn get_manager(&self) -> Result<GlobalSystemMediaTransportControlsSessionManager> {
-    if let Some(manager) = &self.smtc_manager {
-      return Ok(manager.clone());
-    }
-
-    Err(Error::new(
-      Status::GenericFailure,
-      "SMTCMonitor not initialized. Please call initialize() first.".to_string(),
-    ))
+    self.smtc_manager.clone().ok_or_else(|| {
+      Error::new(
+        Status::GenericFailure,
+        "SMTCMonitor not initialized. Please call initialize() first.".to_string(),
+      )
+    })
   }
 
   fn scan_existing_sessions(&mut self) -> Result<()> {
     let manager = self.get_manager()?;
+
     if let Ok(sessions) = manager.GetSessions() {
-      let mut inner = self.manager.lock().unwrap();
+      if let Ok(mut inner) = self.manager.lock() {
+        if let Ok(size) = sessions.Size() {
+          for i in 0..size {
+            if let Ok(session) = sessions.GetAt(i) {
+              if let Ok(id) = session.SourceAppUserModelId() {
+                let id = id.to_string();
 
-      if let Ok(size) = sessions.Size() {
-        for i in 0..size {
-          if let Ok(session) = sessions.GetAt(i) {
-            if let Ok(id) = session.SourceAppUserModelId() {
-              let id = id.to_string();
-
-              // 如果是新会话，添加到管理器并设置监听
-              if !inner.sessions.contains_key(&id) {
-                Self::register_session(&mut inner, id.clone(), session);
+                // 如果是新会话，添加到管理器并设置监听
+                if !inner.sessions.contains_key(&id) {
+                  Self::register_session(&mut inner, id.clone(), session);
+                }
               }
             }
           }

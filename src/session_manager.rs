@@ -38,29 +38,26 @@ impl SessionManager {
 
   // 添加清理所有会话监听的方法
   pub fn clear_all_sessions(&mut self) {
-    for (_, session_data) in self.sessions.iter_mut() {
-      // 取消注册媒体属性变更事件
+    // 使用迭代器方法简化逻辑
+    for session_data in self.sessions.values_mut() {
+      // 使用 Option 的 take 方法简化移除并获取值的操作
       if let Some(token) = session_data.media_props_token.take() {
         let _ = session_data.session.RemoveMediaPropertiesChanged(token);
       }
 
-      // 取消注册播放信息变更事件
       if let Some(token) = session_data.playback_info_token.take() {
         let _ = session_data.session.RemovePlaybackInfoChanged(token);
       }
 
-      // 取消注册时间线属性变更事件
       if let Some(token) = session_data.timeline_props_token.take() {
         let _ = session_data.session.RemoveTimelinePropertiesChanged(token);
       }
     }
 
-    // 清空会话集合
     self.sessions.clear();
   }
 }
 
-// 注册会话方法
 pub fn register_session(
   inner: &mut SessionManager,
   id: String,
@@ -68,10 +65,6 @@ pub fn register_session(
 ) {
   let media_session_clone = session.clone();
   let media_props_callbacks = inner.media_props_callbacks.clone();
-  let playback_session_clone = session.clone();
-  let playback_info_callbacks = inner.playback_info_callbacks.clone();
-  let timeline_session_clone = session.clone();
-  let timeline_props_callbacks = inner.timeline_props_callbacks.clone();
 
   let media_token = session
     .MediaPropertiesChanged(&TypedEventHandler::new(move |_, _| {
@@ -85,6 +78,9 @@ pub fn register_session(
     }))
     .ok();
 
+  let playback_session_clone = session.clone();
+  let playback_info_callbacks = inner.playback_info_callbacks.clone();
+
   let playback_token = session
     .PlaybackInfoChanged(&TypedEventHandler::new(move |_, _| {
       if let Ok(Some(media_info)) = utils::get_media_info_for_session(&playback_session_clone) {
@@ -95,6 +91,9 @@ pub fn register_session(
       Ok(())
     }))
     .ok();
+
+  let timeline_session_clone = session.clone();
+  let timeline_props_callbacks = inner.timeline_props_callbacks.clone();
 
   let timeline_token = session
     .TimelinePropertiesChanged(&TypedEventHandler::new(move |_, _| {
@@ -118,6 +117,7 @@ pub fn register_session(
     },
   );
 
+  // 通知会话添加
   if let Ok(Some(media_info)) = utils::get_media_info_for_session(&session) {
     for callback in &inner.session_added_callbacks {
       callback.call(Ok(media_info.clone()), ThreadsafeFunctionCallMode::Blocking);

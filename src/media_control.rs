@@ -7,10 +7,13 @@ use crate::utils;
 #[napi]
 pub fn get_current_session() -> Result<Option<MediaInfo>> {
   let manager = create_manager()?;
-  if let Ok(session) = manager.GetCurrentSession() {
-    return utils::get_media_info_for_session(&session);
-  }
-  Ok(None)
+
+  manager
+    .GetCurrentSession()
+    .ok()
+    .map_or(Ok(None), |session| {
+      utils::get_media_info_for_session(&session)
+    })
 }
 
 #[napi]
@@ -55,11 +58,10 @@ pub fn get_session_by_id(source_app_id: String) -> Result<Option<MediaInfo>> {
 }
 
 pub fn create_manager() -> Result<GlobalSystemMediaTransportControlsSessionManager> {
-  match GlobalSystemMediaTransportControlsSessionManager::RequestAsync() {
-    Ok(operation) => match operation.get() {
-      Ok(manager) => Ok(manager),
-      Err(e) => Err(Error::new(Status::GenericFailure, e.to_string())),
-    },
-    Err(e) => Err(Error::new(Status::GenericFailure, e.to_string())),
-  }
+  let operation = GlobalSystemMediaTransportControlsSessionManager::RequestAsync()
+    .map_err(|e| Error::new(Status::GenericFailure, e.to_string()))?;
+
+  operation
+    .get()
+    .map_err(|e| Error::new(Status::GenericFailure, e.to_string()))
 }
