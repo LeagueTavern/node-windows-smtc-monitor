@@ -20,8 +20,15 @@ permissions:
   pull_request: null
 jobs:
   build:
-    name: stable - x86_64-pc-windows-msvc - node@20
+    name: stable - ${{ matrix.target }} - node@20
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - x86_64-pc-windows-msvc
+          - aarch64-pc-windows-msvc
+          - i686-pc-windows-msvc
     steps:
       - uses: actions/checkout@v4
       - name: Setup node
@@ -33,7 +40,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          targets: x86_64-pc-windows-msvc
+          targets: ${{ matrix.target }}
       - name: Cache cargo
         uses: actions/cache@v4
         with:
@@ -43,20 +50,20 @@ jobs:
             ~/.cargo/git/db/
             .cargo-cache
             target/
-          key: x86_64-pc-windows-msvc-cargo-windows-latest
+          key: ${{ matrix.target }}-cargo-windows-latest
       - name: Install dependencies
         run: npm install
       - name: Build
-        run: npm run build --target x86_64-pc-windows-msvc
+        run: npm run build --target ${{ matrix.target }}
         shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bindings-x86_64-pc-windows-msvc
-          path: x86_64-pc-windows-msvc/${{ env.APP_NAME }}.*.node
+          name: bindings-${{ matrix.target }}
+          path: ${{ matrix.target }}/${{ env.APP_NAME }}.*.node
           if-no-files-found: error
   test-windows-binding:
-    name: Test bindings on x86_64-pc-windows-msvc - node@${{ matrix.node }}
+    name: Test bindings on ${{ matrix.target }} - node@${{ matrix.node }}
     needs:
       - build
     strategy:
@@ -65,6 +72,10 @@ jobs:
         node:
           - '18'
           - '20'
+        target:
+          - x86_64-pc-windows-msvc
+          - aarch64-pc-windows-msvc
+          - i686-pc-windows-msvc
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -79,7 +90,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: bindings-x86_64-pc-windows-msvc
+          name: bindings-${{ matrix.target }}
           path: .
       - name: List packages
         run: ls -R .
