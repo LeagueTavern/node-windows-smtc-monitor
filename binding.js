@@ -310,6 +310,9 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { SMTCMonitor } = nativeBinding
+const { getCurrentSession, getAllSessions, getSessionById, SMTCMonitor } = nativeBinding
 
+module.exports.getCurrentSession = getCurrentSession
+module.exports.getAllSessions = getAllSessions
+module.exports.getSessionById = getSessionById
 module.exports.SMTCMonitor = SMTCMonitor

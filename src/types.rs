@@ -1,5 +1,5 @@
-use std::fmt;
 use napi_derive::napi;
+use std::fmt;
 
 #[napi(object)]
 #[derive(Clone)]
@@ -21,7 +21,6 @@ pub struct MediaInfo {
   pub last_updated_time: f64,
 }
 
-// 手动实现 Debug trait，忽略 thumbnail 字段
 impl fmt::Debug for MediaInfo {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     f.debug_struct("MediaInfo")

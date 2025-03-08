@@ -1,20 +1,28 @@
 const os = require("os")
 const { EventEmitter } = require("events")
 const { PlaybackStatus } = require("./constant")
-const { SMTCMonitor: SMTC } = require("./binding")
+const {
+  SMTCMonitor: SMTC,
+  getCurrentSession,
+  getAllSessions,
+  getSessionById,
+} = require("./binding")
 
 class SMTCMonitor extends EventEmitter {
   constructor() {
     super()
     this.smtc = new SMTC()
     this._mediaSessions = new Map()
-    this._preloadSessions()
     this._bindEvents()
-    this.smtc.initialize()
+    this._initialize()
+    this._preloadSessions()
   }
 
+  _initialize() {
+    this.smtc.initialize()
+  }
   _preloadSessions() {
-    this.smtc.getAllSessions().forEach((session) => {
+    SMTCMonitor.getCurrentMediaSessions().forEach((session) => {
       this._mediaSessions.set(session.sourceAppId, session)
     })
   }
@@ -92,17 +100,34 @@ class SMTCMonitor extends EventEmitter {
     return Array.from(this._mediaSessions.values())
   }
 
-  getCurrentMediaSession() {
-    return this.smtc.getCurrentSession()
+  static getCurrentMediaSessions() {
+    return getAllSessions()
   }
 
-  getMediaSessionByAppId(sourceAppId) {
-    return this.smtc.getSessionById(sourceAppId)
+  static getCurrentMediaSession() {
+    return getCurrentSession()
+  }
+
+  static getMediaSessionByAppId(sourceAppId) {
+    return getSessionById(sourceAppId)
   }
 
   destroy() {
-    this.smtc.destroy()
-    this.removeAllListeners()
+    try {
+      this.removeAllListeners()
+
+      if (this.smtc) {
+        this.smtc.destroy()
+        this.smtc = null
+      }
+
+      if (this._mediaSessions) {
+        this._mediaSessions.clear()
+        this._mediaSessions = null
+      }
+    } catch (e) {
+      console.error("Error during SMTCMonitor destroy:", e)
+    }
   }
 }
 

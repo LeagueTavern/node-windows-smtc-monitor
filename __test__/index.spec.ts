@@ -1,26 +1,16 @@
 import test from "ava"
-import { SMTCMonitor } from "../index"
+import { getCurrentSession, getAllSessions, getSessionById } from "../binding"
 
-const smtc = new SMTCMonitor()
-
-test("SMTCMonitor is instantiated", (t) => {
-  t.truthy(smtc)
-})
-
-test("getCurrentMediaSession returns null if no sessions are present", (t) => {
-  const session = smtc.getCurrentMediaSession()
+test("getCurrentSession() should return MediaInfo | null", (t) => {
+  const session = getCurrentSession()
   t.true(session === null || "sourceAppId" in session)
 })
 
-test("getAllMediaSessions returns an empty array if no sessions are present", (t) => {
-  const sessions = smtc.getAllMediaSessions()
+test("getAllSessions() should return MediaInfo[]", (t) => {
+  const sessions = getAllSessions()
   t.true(Array.isArray(sessions))
 })
 
-test("getMediaSessionByAppId returns null", (t) => {
-  t.is(smtc.getMediaSessionByAppId("nonexistent"), null)
-})
-
-test.after.always("cleanup resources", () => {
-  smtc.destroy()
+test("getSessionById() should return null", (t) => {
+  t.is(getSessionById("nonexistent"), null)
 })

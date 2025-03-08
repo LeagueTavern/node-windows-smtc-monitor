@@ -4,9 +4,9 @@ const smtc = new SMTCMonitor()
 
 const main = () => {
   console.log("---CURRENT MEDIA SESSION---")
-  console.log(smtc.getCurrentMediaSession())
+  console.log(SMTCMonitor.getCurrentMediaSession())
   console.log("---ALL MEDIA SESSIONS---")
-  console.log(smtc.getAllMediaSessions())
+  console.log(SMTCMonitor.getCurrentMediaSessions())
   console.log("SMTC MONITOR IS LISTENING FOR EVENTS...")
 }
 

@@ -27,11 +27,11 @@ declare class SMTCMonitor extends EventEmitter {
   private _onSessionAdded(media: MediaInfo): void
   private _onSessionRemoved(sourceAppId: string): void
 
-  getAllMediaSessions(): MediaInfo[]
-  getCurrentMediaSession(): MediaInfo | null
-  getMediaSessionByAppId(sourceAppId: string): MediaInfo | null
-  destroy(): void
+  static getCurrentMediaSessions(): MediaInfo[]
+  static getCurrentMediaSession(): MediaInfo | null
+  static getMediaSessionByAppId(sourceAppId: string): MediaInfo | null
 
+  getAllMediaSessions(): MediaInfo[]
   on(event: "session-media-changed", listener: (media: MediaInfo) => void): this
   on(
     event: "session-timeline-changed",
@@ -43,6 +43,7 @@ declare class SMTCMonitor extends EventEmitter {
   ): this
   on(event: "session-added", listener: (media: MediaInfo) => void): this
   on(event: "session-removed", listener: (sourceAppId: string) => void): this
+  destroy(): void
 }
 
 export { SMTCMonitor }

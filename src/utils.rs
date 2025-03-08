@@ -15,34 +15,27 @@ use windows::{
 
 use crate::types::MediaInfo;
 
-// 辅助函数用于错误转换，替代 From trait 实现
 pub fn win_to_napi_err<T>(result: core::Result<T>) -> Result<T> {
   result.map_err(|e| Error::new(Status::GenericFailure, e.to_string()))
 }
 
-// 辅助函数用于 TimeSpan 转换到秒数
 pub fn timespan_to_seconds(ts: TimeSpan) -> f64 {
-  // TimeSpan 以 100 纳秒为单位
   ts.Duration as f64 / 10_000_000.0
 }
 
-// 修正 Buffer 的使用
 pub fn buffer_to_napi_buffer(win_buffer: &WinBuffer) -> Result<Option<Buffer>> {
   let length = win_to_napi_err(win_buffer.Length())?;
   if length > 0 {
-    // 转换为 Vec<u8>
     let mut bytes = vec![0u8; length as usize];
     let data_reader = win_to_napi_err(DataReader::FromBuffer(win_buffer))?;
     win_to_napi_err(data_reader.ReadBytes(&mut bytes))?;
 
-    // 将 Vec<u8> 转换为 napi Buffer
     Ok(Some(bytes.into()))
   } else {
     Ok(None)
   }
 }
 
-// 获取会话的 MediaInfo
 pub fn get_media_info_for_session(
   session: &GlobalSystemMediaTransportControlsSession,
 ) -> Result<Option<MediaInfo>> {
@@ -97,7 +90,6 @@ pub fn get_media_info_for_session(
       None
     };
 
-    // 获取播放信息
     let playback_info = win_to_napi_err(session.GetPlaybackInfo())?;
 
     let playback_status = match win_to_napi_err(playback_info.PlaybackStatus())? {
@@ -127,9 +119,7 @@ pub fn get_media_info_for_session(
       Err(_) => 0,
     };
 
-    // 获取时间线信息
     let timeline_props = win_to_napi_err(session.GetTimelineProperties())?;
-    // 正确处理 TimeSpan
     let position = timespan_to_seconds(win_to_napi_err(timeline_props.Position())?);
     let duration = timespan_to_seconds(win_to_napi_err(timeline_props.EndTime())?);
     let last_updated_time = SystemTime::now()
