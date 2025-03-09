@@ -1,6 +1,6 @@
 {
   "name": "@coooookies/windows-smtc-monitor-win32-ia32-msvc",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "os": [
     "win32"
   ],
