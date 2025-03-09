@@ -9,6 +9,7 @@
 ![Screenshot](docs/screenshot-1.png)
 
 ## ⚠️ Warning
+
 `node-windows-smtc-monitor` only supports Windows 10 1809 and later versions (>= 10.0.17763)
 
 ## Features
@@ -38,9 +39,6 @@ npm i @coooookies/windows-smtc-monitor
 // Typescript & ESModule
 import { SMTCMonitor } from '@coooookies/windows-smtc-monitor';
 
-// Typescript Definition (Optional)
-import type { MediaInfo, MediaProps, PlaybackInfo, TimelineProps } from "@coooookies/windows-smtc-monitor"
-
 // CommonJS
 const { SMTCMonitor } = require('@coooookies/windows-smtc-monitor');
 ```
@@ -50,7 +48,7 @@ const { SMTCMonitor } = require('@coooookies/windows-smtc-monitor');
 Gets all of the available sessions.
 
 ```Typescript
-const sessions = SMTCMonitor.getMediaSessions(); // MediaSession[]
+const sessions = SMTCMonitor.getMediaSessions(); // MediaInfo[]
 // [
 //   {
 //     sourceAppId: 'PotPlayerMini64.exe',
@@ -83,7 +81,7 @@ const sessions = SMTCMonitor.getMediaSessions(); // MediaSession[]
 Gets the current session. This is the session the system believes the user would most likely want to control.
 
 ```Typescript
-const session = SMTCMonitor.getCurrentMediaSession(); // MediaSession | null
+const session = SMTCMonitor.getCurrentMediaSession(); // MediaInfo | null
 // {
 //   sourceAppId: 'PotPlayerMini64.exe',
 //   media: { ... },
@@ -98,7 +96,7 @@ const session = SMTCMonitor.getCurrentMediaSession(); // MediaSession | null
 Gets the specified session by the sourceAppId.
 
 ```Typescript
-const session = SMTCMonitor.getMediaSessionByAppId('player.exe'); // MediaSession | null
+const session = SMTCMonitor.getMediaSessionByAppId('player.exe'); // MediaInfo | null
 // {
 //   sourceAppId: 'player.exe',
 //   media: { ... },
@@ -107,3 +105,46 @@ const session = SMTCMonitor.getMediaSessionByAppId('player.exe'); // MediaSessio
 //   lastUpdatedTime: 1740000000000
 // }
 ```
+
+#### Using Listeners
+
+If you need to continuously listen for media events, you might consider using the `getMediaSessions` method for polling. However, this approach can be resource-intensive. Instead, `node-windows-smtc-monitor` provides a listener class that allows you to listen for events such as
+[GlobalSystemMediaTransportControlsSessionManager.CurrentSessionChanged](https://learn.microsoft.com/en-us/uwp/api/windows.media.control.globalsystemmediatransportcontrolssessionmanager.currentsessionchanged?view=winrt-26100)
+[GlobalSystemMediaTransportControlsSessionManager.SessionsChanged](https://learn.microsoft.com/en-us/uwp/api/windows.media.control.globalsystemmediatransportcontrolssessionmanager.sessionschanged?view=winrt-26100)
+and other related events to monitor media sessions efficiently.
+
+```Typescript
+// Register the monitor
+const monitor = new SMTCMonitor();
+
+// Normal use
+monitor.on('session-media-changed', (appId, mediaProps) => {
+  console.log(`Media info changed for ${appId}`, mediaProps);
+});
+
+// Using a listener defined outside
+const listener = (appId, playbackInfo) => {
+  console.log(`Playback state changed for ${appId}`, playbackInfo);
+};
+
+monitor.on('session-playback-changed', listener); // Register the listener
+monitor.off('session-playback-changed', listener); // Unregister the listener
+
+
+// Destroy monitoring when done
+// monitor.destroy();
+```
+
+Here is a list of available events:
+
+| Event Name               | Description                                 | Parameters                                    |
+| ------------------------ | ------------------------------------------- | --------------------------------------------- |
+| session-media-changed    | Triggered when media info changes           | (appId: string, mediaProps: MediaProps)       |
+| session-timeline-changed | Triggered when position or duration changes | (appId: string, timelineProps: TimelineProps) |
+| session-playback-changed | Triggered when playback state changes       | (appId: string, playbackInfo: PlaybackInfo)   |
+| session-added            | Triggered when a new media session is added | (appId: string, mediaInfo: MediaInfo)         |
+| session-removed          | Triggered when a media session is removed   | (appId: string)                               |
+| current-session-changed  | Triggered when the current session changes  | (appId: string)                               |
+
+## License
+This project is licensed under the [MIT](LICENSE) License.
