@@ -122,9 +122,6 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: yarn
           architecture: x64
-      - name: Enable Corepack
-        run: corepack enable
-        shell: bash
       - name: Install dependencies
         run: yarn install
       - name: Download artifacts
@@ -149,9 +146,6 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-      - name: Enable Corepack
-        run: corepack enable
-        shell: bash
       - name: Install dependencies
         run: yarn install
       - name: Download all artifacts
