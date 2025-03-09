@@ -12,7 +12,7 @@
 
 `node-windows-smtc-monitor` only supports Windows 10 1809 and later versions (>= 10.0.17763)
 
-## Features
+## 🚀 Features
 
 - Listen to media events such as play, pause, next track, previous track.
 - Get the current playback state and track information.
