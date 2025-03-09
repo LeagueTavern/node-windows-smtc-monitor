@@ -12,39 +12,41 @@ const main = () => {
 
 const smtc = new SMTCMonitor()
 
-smtc.on("session-media-changed", (media) => {
+smtc.on("session-media-changed", (appId, mediaProps) => {
   console.log(
     "session-media-changed",
-    media.sourceAppId,
-    media.title,
-    media.thumbnail?.length
+    appId,
+    mediaProps.title,
+    mediaProps.thumbnail?.length
   )
 })
 
-smtc.on("session-timeline-changed", (media) => {
+smtc.on("session-timeline-changed", (appId, timelineProps) => {
   console.log(
     "session-timeline-changed",
-    media.sourceAppId,
-    `${Math.round((media.position / media.duration) * 10000) / 100}%`,
-    media.position,
-    media.duration
+    appId,
+    `${
+      timelineProps.duration > 0
+        ? Math.round(
+            (timelineProps.position / timelineProps.duration) * 10000
+          ) / 100
+        : "-"
+    }%`,
+    timelineProps.position,
+    timelineProps.duration
   )
 })
 
-smtc.on("session-playback-changed", (media) => {
-  console.log(
-    "session-playback-changed",
-    media.sourceAppId,
-    media.playbackStatus
-  )
+smtc.on("session-playback-changed", (appId, playbackInfo) => {
+  console.log("session-playback-changed", appId, playbackInfo.playbackStatus)
 })
 
-smtc.on("session-added", (media) => {
-  console.log("session-added", media.sourceAppId)
+smtc.on("session-added", (appId, mediaInfo) => {
+  console.log("session-added", appId, mediaInfo.lastUpdatedTime)
 })
 
-smtc.on("session-removed", (sourceAppId) => {
-  console.log("session-removed", sourceAppId)
+smtc.on("session-removed", (appId) => {
+  console.log("session-removed", appId)
 })
 
 main()
