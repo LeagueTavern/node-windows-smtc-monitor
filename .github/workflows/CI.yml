@@ -1,25 +1,26 @@
 name: CI
-
 env:
   DEBUG: napi:*
   APP_NAME: windows-smtc-monitor
-
-"on":
+  MACOSX_DEPLOYMENT_TARGET: '10.13'
+permissions:
+  contents: write
+  id-token: write
+'on':
   push:
     branches:
       - master
     tags-ignore:
-      - "**"
+      - '**'
     paths-ignore:
-      - "**/*.md"
+      - '**/*.md'
       - LICENSE
-      - "**/*.gitignore"
+      - '**/*.gitignore'
       - .editorconfig
       - docs/**
   pull_request: null
 jobs:
   build:
-    if: ${{ !contains(github.event.head_commit.message, 'skip ci') }}
     strategy:
       fail-fast: false
       matrix:
@@ -28,7 +29,9 @@ jobs:
             build: yarn build --target x86_64-pc-windows-msvc
             target: x86_64-pc-windows-msvc
           - host: windows-latest
-            build: yarn build --target i686-pc-windows-msvc
+            build: |
+              yarn build --target i686-pc-windows-msvc
+              yarn test
             target: i686-pc-windows-msvc
           - host: windows-latest
             target: aarch64-pc-windows-msvc
@@ -85,7 +88,7 @@ jobs:
         if: ${{ matrix.settings.docker }}
         with:
           image: ${{ matrix.settings.docker }}
-          options: "--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build"
+          options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: ${{ matrix.settings.build }}
       - name: Build
         run: ${{ matrix.settings.build }}
@@ -108,8 +111,8 @@ jobs:
           - host: windows-latest
             target: x86_64-pc-windows-msvc
         node:
-          - "18"
-          - "20"
+          - '18'
+          - '20'
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
@@ -142,7 +145,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          check-latest: true
           cache: yarn
       - name: Install dependencies
         run: yarn install
@@ -150,22 +152,20 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-      - name: Move Node.js artifacts
+      - name: Move artifacts
         run: yarn artifacts
-      - name: List node packages
+      - name: List packages
         run: ls -R ./npm
         shell: bash
-
-      - name: Publish to npm packages
+      - name: Publish
         run: |
+          npm config set provenance true
           if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$";
           then
-            echo "Publishing node packages"
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             npm publish --access public
           elif git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+";
           then
-            echo "Publishing node packages"
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             npm publish --tag next --access public
           else
