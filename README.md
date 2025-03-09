@@ -1,8 +1,14 @@
+<center>
+
 # Node-Windows-SMTC-Monitor
 
-<a href="https://github.com/LeagueTavern/node-windows-smtc-monitor/actions"><img alt="GitHub CI Status" src="https://github.com/LeagueTavern/node-windows-smtc-monitor/workflows/CI/badge.svg?branch=master"></a>
+<a href="https://github.com/LeagueTavern/node-windows-smtc-monitor/actions"><img alt="GitHub CI Status" src="https://github.com/LeagueTavern/node-windows-smtc-monitor/actions/workflows/CI.yml/badge.svg"></a>
+<a href="https://github.com/LeagueTavern/node-windows-smtc-monitor/issues"><img src="https://img.shields.io/github/issues/LeagueTavern/node-windows-smtc-monitor" alt="@coooookies/windows-smtc-monitor downloads"></a>
+<a href="https://nodejs.org/en/about/releases/"><img src="https://img.shields.io/static/v1?label=node&message=>16.0.0&color=green" alt="Node.js version"></a>
 <a href="https://www.npmjs.com/package/@coooookies/windows-smtc-monitor"><img src="https://img.shields.io/npm/v/@coooookies/windows-smtc-monitor.svg?sanitize=true" alt="@coooookies/windows-smtc-monitor npm version"></a>
 <a href="https://npmcharts.com/compare/@coooookies/windows-smtc-monitor?minimal=true"><img src="https://img.shields.io/npm/dm/@coooookies/windows-smtc-monitor.svg?sanitize=true" alt="@coooookies/windows-smtc-monitor downloads"></a>
+
+</center>
 
 > This is a [Node.js](https://nodejs.org/) toolkit for listening to [SMTC](https://learn.microsoft.com/en-us/uwp/api/windows.media.control.globalsystemmediatransportcontrolssessionmanager?view=winrt-26100) (System Media Transport Controls) media events in Windows. It is written in [Rust](https://www.rust-lang.org/) and utilizes [napi-rs](https://napi.rs/) to implement bindings with Node.js.
 
