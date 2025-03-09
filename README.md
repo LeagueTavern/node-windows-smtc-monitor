@@ -130,6 +130,8 @@ const listener = (appId, playbackInfo) => {
 monitor.on('session-playback-changed', listener); // Register the listener
 monitor.off('session-playback-changed', listener); // Unregister the listener
 
+console.log(monitor.sessions)
+// Shows all the sessions
 
 // Destroy monitoring when done
 // monitor.destroy();
