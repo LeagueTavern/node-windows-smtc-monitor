@@ -136,13 +136,16 @@ function _checkCompatibility() {
   const globalWarning = `SMTCMonitor is designed to work with Windows.Media.Control namespace, which requires GlobalSystemMediaTransportControlsSessionManager feature.`
   let warnings = []
 
-  if (process.platform !== "win32" || process.arch !== "x64") {
+  if (
+    process.platform !== "win32" ||
+    !["ia32", "x64", "arm64"].includes(process.arch)
+  ) {
     warnings.push(
-      `SMTC Feature is not supported on this platform. Please use Windows 10 or later with x64 architecture.`
+      `SMTC Feature is not supported on this platform. Please use Windows 10 or later with x64 / ia32 / arm64 architecture.`
     )
   } else if (!version || _compareVersions(version, "10.0.17763") < 0) {
     warnings.push(
-      `Please use Windows 10 version 1809 (10.0.17763) or later with x64 architecture.`
+      `Please use Windows 10 version 1809 (10.0.17763) or later.`
     )
   }
 
