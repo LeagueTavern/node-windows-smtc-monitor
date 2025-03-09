@@ -1,4 +1,4 @@
-import { SMTCMonitor } from "../index"
+import { SMTCMonitor } from "../index.mjs"
 
 const main = () => {
   console.log("---CURRENT MEDIA SESSION---")

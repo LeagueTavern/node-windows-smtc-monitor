@@ -5,6 +5,12 @@
   "main": "index.js",
   "module": "index.mjs",
   "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.js"
+    }
+  },
   "author": {
     "name": "Coooookies",
     "email": "admin@mitay.net",
@@ -60,7 +66,9 @@
     "artifacts": "napi artifacts",
     "build": "napi build --platform --release --js binding.js --dts binding.d.ts",
     "build:debug": "napi build --platform --js binding.js --dts binding.d.ts",
-    "example": "npm run build && node -r @swc-node/register example/index.ts",
+    "example:ts": "npm run build && node -r @swc-node/register example/index.ts",
+    "example:mjs": "npm run build && node --experimental-specifier-resolution=node example/index.mjs",
+    "example": "npm run build && node example/index.js",
     "prepublishOnly": "napi prepublish -t npm && esbuild binding.js --minify --allow-overwrite --outfile=binding.js",
     "test": "ava __test__/**/index*.*",
     "universal": "napi universal",

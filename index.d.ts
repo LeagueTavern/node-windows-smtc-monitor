@@ -1,5 +1,6 @@
 import { EventEmitter } from "events"
-import { MediaInfo, SMTCMonitor as SMTC } from "./binding"
+import { SMTCMonitor as SMTC } from "./binding"
+import type { MediaInfo } from "./binding"
 
 /**
  * Global System Media Transport Controls Session Playback Status
@@ -46,4 +47,4 @@ declare class SMTCMonitor extends EventEmitter {
   destroy(): void
 }
 
-export { SMTCMonitor }
+export { SMTCMonitor, MediaInfo }

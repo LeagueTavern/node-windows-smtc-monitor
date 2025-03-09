@@ -1,4 +1,4 @@
-import { SMTCMonitor } from "../index"
+const { SMTCMonitor } = require("../index")
 
 const main = () => {
   console.log("---CURRENT MEDIA SESSION---")
