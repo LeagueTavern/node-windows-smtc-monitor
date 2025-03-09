@@ -4,7 +4,7 @@ const { PlaybackStatus } = require("./constant")
 const {
   SMTCMonitor: SMTC,
   getCurrentSession,
-  getAllSessions,
+  getSessions,
   getSessionById,
 } = require("./binding")
 
@@ -22,7 +22,7 @@ class SMTCMonitor extends EventEmitter {
     this.smtc.initialize()
   }
   _preloadSessions() {
-    SMTCMonitor.getCurrentMediaSessions().forEach((session) => {
+    SMTCMonitor.getMediaSessions().forEach((session) => {
       this._mediaSessions.set(session.sourceAppId, session)
     })
   }
@@ -46,6 +46,10 @@ class SMTCMonitor extends EventEmitter {
 
     this.smtc.onSessionRemoved((error, sourceAppId) => {
       !error && this._onSessionRemoved(sourceAppId)
+    })
+
+    this.smtc.onCurrentSessionChanged((error, sourceAppId) => {
+      !error && this._onCurrentSessionChanged(sourceAppId)
     })
   }
 
@@ -89,19 +93,24 @@ class SMTCMonitor extends EventEmitter {
   }
 
   _onSessionRemoved(sourceAppId) {
-    const mediaSession = this._mediaSessions.get(sourceAppId)
-    if (mediaSession) {
+    if (this._mediaSessions.has(sourceAppId)) {
       this._mediaSessions.delete(sourceAppId)
       this.emit("session-removed", sourceAppId)
     }
   }
 
-  getAllMediaSessions() {
+  _onCurrentSessionChanged(sourceAppId) {
+    if (this._mediaSessions.has(sourceAppId)) {
+      this.emit("current-session-changed", sourceAppId)
+    }
+  }
+
+  get sessions() {
     return Array.from(this._mediaSessions.values())
   }
 
-  static getCurrentMediaSessions() {
-    return getAllSessions()
+  static getMediaSessions() {
+    return getSessions()
   }
 
   static getCurrentMediaSession() {

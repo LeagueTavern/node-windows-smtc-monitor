@@ -23,6 +23,7 @@ pub struct SessionManager {
   pub media_props_callbacks: Vec<ThreadsafeFunction<MediaPropsCallbackData>>,
   pub playback_info_callbacks: Vec<ThreadsafeFunction<PlaybackInfoCallbackData>>,
   pub timeline_props_callbacks: Vec<ThreadsafeFunction<TimelinePropsCallbackData>>,
+  pub current_session_changed_callbacks: Vec<ThreadsafeFunction<String>>,
 }
 
 impl SessionManager {
@@ -34,6 +35,7 @@ impl SessionManager {
       media_props_callbacks: Vec::new(),
       playback_info_callbacks: Vec::new(),
       timeline_props_callbacks: Vec::new(),
+      current_session_changed_callbacks: Vec::new(),
     }
   }
 

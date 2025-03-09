@@ -34,30 +34,20 @@ declare class SMTCMonitor extends EventEmitter {
   private _onPlaybackInfoChanged(data: PlaybackInfoCallbackData): void
   private _onSessionAdded(media: MediaInfo): void
   private _onSessionRemoved(sourceAppId: string): void
+  private _onCurrentSessionChanged(sourceAppId: string): void
 
-  static getCurrentMediaSessions(): MediaInfo[]
+  static getMediaSessions(): MediaInfo[]
   static getCurrentMediaSession(): MediaInfo | null
   static getMediaSessionByAppId(sourceAppId: string): MediaInfo | null
 
-  getAllMediaSessions(): MediaInfo[]
+  get sessions(): MediaInfo[]
 
-  on(
-    event: "session-media-changed",
-    listener: (sourceAppId: string, mediaProps: MediaProps) => void
-  ): this
-  on(
-    event: "session-timeline-changed",
-    listener: (sourceAppId: string, timelineProps: TimelineProps) => void
-  ): this
-  on(
-    event: "session-playback-changed",
-    listener: (sourceAppId: string, playbackInfo: PlaybackInfo) => void
-  ): this
-  on(
-    event: "session-added",
-    listener: (sourceAppId: string, media: MediaInfo) => void
-  ): this
+  on(event: "session-media-changed", listener: (sourceAppId: string, mediaProps: MediaProps) => void): this
+  on(event: "session-timeline-changed", listener: (sourceAppId: string, timelineProps: TimelineProps) => void): this
+  on(event: "session-playback-changed", listener: (sourceAppId: string, playbackInfo: PlaybackInfo) => void): this
+  on(event: "session-added", listener: (sourceAppId: string, media: MediaInfo) => void): this
   on(event: "session-removed", listener: (sourceAppId: string) => void): this
+  on(event: "current-session-changed", listener: (sourceAppId: string) => void): this
 
   destroy(): void
 }

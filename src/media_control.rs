@@ -17,7 +17,7 @@ pub fn get_current_session() -> Result<Option<MediaInfo>> {
 }
 
 #[napi]
-pub fn get_all_sessions() -> Result<Vec<MediaInfo>> {
+pub fn get_sessions() -> Result<Vec<MediaInfo>> {
   let manager = create_manager()?;
   let sessions = match manager.GetSessions() {
     Ok(s) => s,
