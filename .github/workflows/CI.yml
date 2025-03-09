@@ -46,10 +46,6 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-      - name: Enable Corepack
-        if: ${{ !matrix.settings.docker }}
-        run: corepack enable
-        shell: bash
       - name: Install
         uses: dtolnay/rust-toolchain@stable
         if: ${{ !matrix.settings.docker }}

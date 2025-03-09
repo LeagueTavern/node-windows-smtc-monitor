@@ -78,5 +78,5 @@
     "@swc/core": "^1.11.8"
   },
   "repository": "https://github.com/LeagueTavern/node-windows-smtc-monitor",
-  "packageManager": "yarn@4.7.0"
+  "packageManager": "yarn@3.8.5"
 }
