@@ -1,10 +1,15 @@
 import { EventEmitter } from "events"
 import { SMTCMonitor as SMTC } from "./binding"
-import type { MediaInfo } from "./binding"
+import type {
+  MediaInfo,
+  MediaProps,
+  PlaybackInfo,
+  TimelineProps,
+  MediaPropsCallbackData,
+  PlaybackInfoCallbackData,
+  TimelinePropsCallbackData,
+} from "./binding"
 
-/**
- * Global System Media Transport Controls Session Playback Status
- */
 export enum PlaybackStatus {
   CLOSED = 0,
   OPENED = 1,
@@ -20,11 +25,13 @@ declare class SMTCMonitor extends EventEmitter {
   private smtc: SMTC
   private _mediaSessions: Map<string, MediaInfo>
 
+  private _initialize(): void
   private _preloadSessions(): void
   private _bindEvents(): void
-  private _onMediaPropertiesChanged(media: MediaInfo): void
-  private _onTimelinePropertiesChanged(media: MediaInfo): void
-  private _onPlaybackInfoChanged(media: MediaInfo): void
+
+  private _onMediaPropertiesChanged(data: MediaPropsCallbackData): void
+  private _onTimelinePropertiesChanged(data: TimelinePropsCallbackData): void
+  private _onPlaybackInfoChanged(data: PlaybackInfoCallbackData): void
   private _onSessionAdded(media: MediaInfo): void
   private _onSessionRemoved(sourceAppId: string): void
 
@@ -33,18 +40,26 @@ declare class SMTCMonitor extends EventEmitter {
   static getMediaSessionByAppId(sourceAppId: string): MediaInfo | null
 
   getAllMediaSessions(): MediaInfo[]
-  on(event: "session-media-changed", listener: (media: MediaInfo) => void): this
+
+  on(
+    event: "session-media-changed",
+    listener: (sourceAppId: string, mediaProps: MediaProps) => void
+  ): this
   on(
     event: "session-timeline-changed",
-    listener: (media: MediaInfo) => void
+    listener: (sourceAppId: string, timelineProps: TimelineProps) => void
   ): this
   on(
     event: "session-playback-changed",
-    listener: (media: MediaInfo) => void
+    listener: (sourceAppId: string, playbackInfo: PlaybackInfo) => void
   ): this
-  on(event: "session-added", listener: (media: MediaInfo) => void): this
+  on(
+    event: "session-added",
+    listener: (sourceAppId: string, media: MediaInfo) => void
+  ): this
   on(event: "session-removed", listener: (sourceAppId: string) => void): this
+
   destroy(): void
 }
 
-export { SMTCMonitor, MediaInfo }
+export { SMTCMonitor, MediaInfo, MediaProps, PlaybackInfo, TimelineProps }

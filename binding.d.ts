@@ -6,8 +6,27 @@
 export declare function getCurrentSession(): MediaInfo | null
 export declare function getAllSessions(): Array<MediaInfo>
 export declare function getSessionById(sourceAppId: string): MediaInfo | null
-export interface MediaInfo {
+export interface MediaPropsCallbackData {
   sourceAppId: string
+  mediaProps: MediaProps
+}
+export interface PlaybackInfoCallbackData {
+  sourceAppId: string
+  playbackInfo: PlaybackInfo
+}
+export interface TimelinePropsCallbackData {
+  sourceAppId: string
+  timelineProps: TimelineProps
+}
+export interface TimelineProps {
+  position: number
+  duration: number
+}
+export interface PlaybackInfo {
+  playbackStatus: number
+  playbackType: number
+}
+export interface MediaProps {
   title: string
   artist: string
   albumTitle: string
@@ -16,10 +35,12 @@ export interface MediaInfo {
   albumTrackCount: number
   trackNumber: number
   thumbnail?: Buffer | undefined
-  playbackStatus: number
-  playbackType: number
-  position: number
-  duration: number
+}
+export interface MediaInfo {
+  sourceAppId: string
+  media: MediaProps
+  playback: PlaybackInfo
+  timeline: TimelineProps
   lastUpdatedTime: number
 }
 export declare class SMTCMonitor {
@@ -27,8 +48,8 @@ export declare class SMTCMonitor {
   initialize(): void
   onSessionAdded(callback: (error:unknown, media: MediaInfo) => void): void
   onSessionRemoved(callback: (error:unknown, sourceAppId: MediaInfo) => void): void
-  onMediaPropertiesChanged(callback: (error:unknown, media: MediaInfo) => void): void
-  onPlaybackInfoChanged(callback: (error:unknown, media: MediaInfo) => void): void
-  onTimelinePropertiesChanged(callback: (error:unknown, media: MediaInfo) => void): void
+  onMediaPropertiesChanged(callback: (error:unknown, data: {sourceAppId: string, mediaProps: MediaProps}) => void): void
+  onPlaybackInfoChanged(callback: (error:unknown, data: {sourceAppId: string, playbackInfo: PlaybackInfo}) => void): void
+  onTimelinePropertiesChanged(callback: (error:unknown, data: {sourceAppId: string, timelineProps: TimelineProps}) => void): void
   destroy(): void
 }

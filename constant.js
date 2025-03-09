@@ -1,7 +1,3 @@
-/**
- * Global System Media Transport Controls Session Playback Status
- * @enum {number}
- */
 const PlaybackStatus = {
   CLOSED: 0,
   OPENED: 1,
