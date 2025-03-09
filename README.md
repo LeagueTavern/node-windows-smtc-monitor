@@ -25,7 +25,7 @@
 npm i @coooookies/windows-smtc-monitor
 ```
 
-## Example
+## 🍊 Example
 
 [CommonJS Example](example/index.js) <br />
 [ESModule Example](example/index.mjs) <br />
