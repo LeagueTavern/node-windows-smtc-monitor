@@ -1,5 +1,5 @@
 {
-  "name": "@coooookies/win-smtc-monitor-win32-ia32-msvc",
+  "name": "@coooookies/windows-smtc-monitor-win32-ia32-msvc",
   "version": "1.0.0",
   "os": [
     "win32"
@@ -7,9 +7,9 @@
   "cpu": [
     "ia32"
   ],
-  "main": "win-smtc-monitor.win32-ia32-msvc.node",
+  "main": "windows-smtc-monitor.win32-ia32-msvc.node",
   "files": [
-    "win-smtc-monitor.win32-ia32-msvc.node"
+    "windows-smtc-monitor.win32-ia32-msvc.node"
   ],
   "description": "Fetch Windows SMTC media player information and listen for media control events (e.g., play, pause, skip). Suitable for Windows 1809 and later.",
   "keywords": [

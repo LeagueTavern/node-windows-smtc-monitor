@@ -1,7 +1,7 @@
 name: CI
 env:
   DEBUG: napi:*
-  APP_NAME: win-smtc-monitor
+  APP_NAME: windows-smtc-monitor
   MACOSX_DEPLOYMENT_TARGET: '10.13'
 permissions:
   contents: write
