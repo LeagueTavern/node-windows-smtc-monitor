@@ -149,4 +149,5 @@ Here is a list of available events:
 | current-session-changed  | Triggered when the current session changes  | (appId: string)                               |
 
 ## License
+
 This project is licensed under the [MIT](LICENSE) License.
