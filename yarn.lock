@@ -5,9 +5,9 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@coooookies/win-smtc-monitor@workspace:.":
+"@coooookies/windows-smtc-monitor@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@coooookies/win-smtc-monitor@workspace:."
+  resolution: "@coooookies/windows-smtc-monitor@workspace:."
   dependencies:
     "@napi-rs/cli": ^2.18.4
     "@swc-node/register": ^1.10.9
