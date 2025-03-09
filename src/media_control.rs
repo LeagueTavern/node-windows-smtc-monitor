@@ -19,17 +19,25 @@ pub fn get_current_session() -> Result<Option<MediaInfo>> {
 #[napi]
 pub fn get_all_sessions() -> Result<Vec<MediaInfo>> {
   let manager = create_manager()?;
+  let sessions = match manager.GetSessions() {
+    Ok(s) => s,
+    Err(_) => return Ok(Vec::new()),
+  };
+  
+  let size = match sessions.Size() {
+    Ok(s) => s,
+    Err(_) => return Ok(Vec::new()),
+  };
 
   let mut result = Vec::new();
-  if let Ok(sessions) = manager.GetSessions() {
-    if let Ok(size) = sessions.Size() {
-      for i in 0..size {
-        if let Ok(session) = sessions.GetAt(i) {
-          if let Ok(Some(info)) = utils::get_media_info_for_session(&session) {
-            result.push(info);
-          }
-        }
-      }
+  for i in 0..size {
+    let session = match sessions.GetAt(i) {
+      Ok(s) => s,
+      Err(_) => continue,
+    };
+    
+    if let Ok(Some(info)) = utils::get_media_info_for_session(&session) {
+      result.push(info);
     }
   }
 
@@ -39,18 +47,29 @@ pub fn get_all_sessions() -> Result<Vec<MediaInfo>> {
 #[napi]
 pub fn get_session_by_id(source_app_id: String) -> Result<Option<MediaInfo>> {
   let manager = create_manager()?;
+  let sessions = match manager.GetSessions() {
+    Ok(s) => s,
+    Err(_) => return Ok(None),
+  };
+  
+  let size = match sessions.Size() {
+    Ok(s) => s, 
+    Err(_) => return Ok(None),
+  };
 
-  if let Ok(sessions) = manager.GetSessions() {
-    if let Ok(size) = sessions.Size() {
-      for i in 0..size {
-        if let Ok(session) = sessions.GetAt(i) {
-          if let Ok(id) = session.SourceAppUserModelId() {
-            if id.to_string() == source_app_id {
-              return utils::get_media_info_for_session(&session);
-            }
-          }
-        }
-      }
+  for i in 0..size {
+    let session = match sessions.GetAt(i) {
+      Ok(s) => s,
+      Err(_) => continue,
+    };
+    
+    let id = match session.SourceAppUserModelId() {
+      Ok(id) => id,
+      Err(_) => continue,
+    };
+    
+    if id.to_string() == source_app_id {
+      return utils::get_media_info_for_session(&session);
     }
   }
 
