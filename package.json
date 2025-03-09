@@ -1,7 +1,7 @@
 {
   "name": "@coooookies/windows-smtc-monitor",
   "description": "Fetch Windows SMTC media player information and listen for media control events (e.g., play, pause, skip). Suitable for Windows 1809 and later.",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "main": "index.js",
   "module": "index.mjs",
   "types": "index.d.ts",
@@ -19,7 +19,7 @@
   "napi": {
     "name": "windows-smtc-monitor",
     "triples": {
-      "defaults": true,
+      "defaults": false,
       "additional": [
         "x86_64-pc-windows-msvc",
         "i686-pc-windows-msvc",
