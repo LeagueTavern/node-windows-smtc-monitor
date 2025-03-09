@@ -11,11 +11,11 @@ __metadata:
   dependencies:
     "@napi-rs/cli": ^2.18.4
     "@swc-node/register": ^1.10.9
-    "@swc/core": ^1.9.3
-    "@types/node": ^22.10.1
+    "@swc/core": ^1.11.8
+    "@types/node": ^22.13.10
     ava: ^5.3.1
     ts-node: ^10.9.2
-    typescript: ^5.7.2
+    typescript: ^5.8.2
   languageName: unknown
   linkType: soft
 
@@ -366,7 +366,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@swc/core@npm:^1.9.3":
+"@swc/core@npm:^1.11.8":
   version: 1.11.8
   resolution: "@swc/core@npm:1.11.8"
   dependencies:
@@ -465,7 +465,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.10.1":
+"@types/node@npm:^22.13.10":
   version: 22.13.10
   resolution: "@types/node@npm:22.13.10"
   dependencies:
@@ -2232,7 +2232,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.7.2":
+"typescript@npm:^5.8.2":
   version: 5.8.2
   resolution: "typescript@npm:5.8.2"
   bin:
@@ -2242,7 +2242,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^5.7.2#~builtin<compat/typescript>":
+"typescript@patch:typescript@^5.8.2#~builtin<compat/typescript>":
   version: 5.8.2
   resolution: "typescript@patch:typescript@npm%3A5.8.2#~builtin<compat/typescript>::version=5.8.2&hash=8c6c40"
   bin:
