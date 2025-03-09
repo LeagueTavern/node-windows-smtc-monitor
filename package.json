@@ -3,6 +3,7 @@
   "description": "Fetch Windows SMTC media player information and listen for media control events (e.g., play, pause, skip). Suitable for Windows 1809 and later.",
   "version": "1.0.0",
   "main": "index.js",
+  "module": "index.mjs",
   "types": "index.d.ts",
   "author": {
     "name": "Coooookies",
@@ -27,11 +28,12 @@
     "@swc/core": "^1.11.8",
     "@types/node": "^22.13.10",
     "ava": "^5.3.1",
+    "esbuild": "^0.25.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   },
   "engines": {
-    "node": ">= 10"
+    "node": ">=16.0.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
@@ -49,6 +51,7 @@
   "files": [
     "index.d.ts",
     "index.js",
+    "index.mjs",
     "binding.js",
     "binding.d.ts",
     "constant.js"
@@ -58,7 +61,7 @@
     "build": "napi build --platform --release --js binding.js --dts binding.d.ts",
     "build:debug": "napi build --platform --js binding.js --dts binding.d.ts",
     "example": "npm run build && node -r @swc-node/register example/index.ts",
-    "prepublishOnly": "napi prepublish -t npm",
+    "prepublishOnly": "napi prepublish -t npm && esbuild binding.js --minify --allow-overwrite --outfile=binding.js",
     "test": "ava __test__/**/index*.*",
     "universal": "napi universal",
     "version": "napi version"
