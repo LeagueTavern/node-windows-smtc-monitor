@@ -150,6 +150,12 @@ Here is a list of available events:
 | session-removed          | Triggered when a media session is removed   | (appId: string)                               |
 | current-session-changed  | Triggered when the current session changes  | (appId: string)                               |
 
+## Using in Electron
+
+To use `node-windows-smtc-monitor` in Electron, you need to run it in a Worker thread. Running it in the main process will cause the main thread to lock up, which will freeze the renderer process. An example of how to use it in a Worker is provided in `example/worker.js`. <br />
+
+[Worker Example](example/worker.js)
+
 ## License
 
 This project is licensed under the [MIT](LICENSE) License.
