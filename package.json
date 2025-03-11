@@ -70,6 +70,7 @@
     "example:ts": "npm run build && node -r @swc-node/register example/index.ts",
     "example:mjs": "npm run build && node --experimental-specifier-resolution=node example/index.mjs",
     "example": "npm run build && node example/index.js",
+    "example:worker": "npm run build && node example/worker.js",
     "prepublishOnly": "napi prepublish -t npm && esbuild binding.js --minify --allow-overwrite --outfile=binding.js",
     "test": "ava __test__/**/index*.*",
     "universal": "napi universal",
