@@ -10,6 +10,8 @@
 
 > This is a [Node.js](https://nodejs.org/) toolkit for listening to [SMTC](https://learn.microsoft.com/en-us/uwp/api/windows.media.control.globalsystemmediatransportcontrolssessionmanager?view=winrt-26100) (System Media Transport Controls) media events in Windows. It is written in [Rust](https://www.rust-lang.org/) and utilizes [napi-rs](https://napi.rs/) to implement bindings with Node.js.
 
+English | [简体中文](./README_CN.md)
+
 ## ⚠️ Warning
 
 `node-windows-smtc-monitor` only supports Windows 10 1809 and later versions (>= 10.0.17763)
@@ -112,8 +114,7 @@ const session = SMTCMonitor.getMediaSessionByAppId('player.exe'); // MediaInfo |
 
 If you need to continuously listen for media events, you might consider using the `getMediaSessions` method for polling. However, this approach can be resource-intensive. Instead, `node-windows-smtc-monitor` provides a listener class that allows you to listen for events such as
 [GlobalSystemMediaTransportControlsSessionManager.CurrentSessionChanged](https://learn.microsoft.com/en-us/uwp/api/windows.media.control.globalsystemmediatransportcontrolssessionmanager.currentsessionchanged?view=winrt-26100)
-[GlobalSystemMediaTransportControlsSessionManager.SessionsChanged](https://learn.microsoft.com/en-us/uwp/api/windows.media.control.globalsystemmediatransportcontrolssessionmanager.sessionschanged?view=winrt-26100)
-and other related events to monitor media sessions efficiently.
+[GlobalSystemMediaTransportControlsSessionManager.SessionsChanged](https://learn.microsoft.com/en-us/uwp/api/windows.media.control.globalsystemmediatransportcontrolssessionmanager.sessionschanged?view=winrt-26100) and other related events to monitor media sessions efficiently.
 
 ```Typescript
 // Register the monitor
